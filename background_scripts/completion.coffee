@@ -525,6 +525,27 @@ class SearchEngineCompleter
             suggestion.title ||= suggestion.insertText
             break
 
+class SegmentedMultiCompleter
+  constructor: (@completers) ->
+
+  refresh: (port) -> completer.refresh? port for completer in @completers
+
+  cancel: (port) -> completer.cancel? port for completer in @completers
+
+  filter: (request, onComplete) ->
+    console.log "in filter"
+    # TODO: Check if `onComplete` should be called multiple times
+    # I think it can be
+    Promise.all (@completers
+      .map (completer) ->
+        new Promise((resolve) ->
+          (completer.filter request, resolve)))
+      .then (completionsByCompleter) ->
+        results = [].concat.apply [],
+          completionsByCompleter.map (completions) ->
+            if completions.results? then completions.results else completions
+        onComplete results: results
+
 # A completer which calls filter() on many completers, aggregates the results, ranks them, and returns the top
 # 10. All queries from the vomnibar come through a multi completer.
 class MultiCompleter
@@ -823,6 +844,7 @@ root = exports ? window
 root.Suggestion = Suggestion
 root.BookmarkCompleter = BookmarkCompleter
 root.MultiCompleter = MultiCompleter
+root.SegmentedMultiCompleter = SegmentedMultiCompleter
 root.HistoryCompleter = HistoryCompleter
 root.DomainCompleter = DomainCompleter
 root.TabCompleter = TabCompleter

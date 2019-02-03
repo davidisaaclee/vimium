@@ -48,6 +48,13 @@ completers =
   bookmarks: new MultiCompleter [completionSources.bookmarks]
   tabs: new MultiCompleter [completionSources.tabs]
 
+completers.omniPlusTabs =
+  new SegmentedMultiCompleter [
+    completers.tabs
+    completers.omni,
+  ]
+
+
 completionHandlers =
   filter: (completer, request, port) ->
     completer.filter request, (response) ->
