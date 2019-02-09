@@ -534,22 +534,6 @@ deepFlatten = (array) ->
       result.push element
   result
 
-class SegmentedMultiCompleter
-  constructor: (@completers) ->
-
-  refresh: (port) -> completer.refresh? port for completer in @completers
-
-  cancel: (port) -> completer.cancel? port for completer in @completers
-
-  filter: (request, onComplete) ->
-    completionsByCompleter = @completers.map -> []
-    jobRunner = new JobRunner @completers.map (completer, completerIndex) ->
-      (callback) ->
-        completer.filter request, (newSuggestions = [], { continuation, filter } = {}) ->
-          completionsByCompleter[completerIndex].push (if newSuggestions.results? then newSuggestions.results else newSuggestions)
-          callback()
-    jobRunner.onReady => onComplete results: deepFlatten completionsByCompleter
-
 # A completer which calls filter() on many completers, aggregates the results, ranks them, and returns the top
 # 10. All queries from the vomnibar come through a multi completer.
 class MultiCompleter
@@ -637,6 +621,22 @@ class MultiCompleter
     # Generate HTML for the remaining suggestions and return them.
     suggestion.generateHtml request for suggestion in suggestions
     suggestions
+
+class SegmentedMultiCompleter
+  constructor: (@completers) ->
+
+  refresh: (port) -> completer.refresh? port for completer in @completers
+
+  cancel: (port) -> completer.cancel? port for completer in @completers
+
+  filter: (request, onComplete) ->
+    completionsByCompleter = @completers.map -> []
+    jobRunner = new JobRunner @completers.map (completer, completerIndex) ->
+      (callback) ->
+        completer.filter request, (newSuggestions = [], { continuation, filter } = {}) ->
+          completionsByCompleter[completerIndex].push (if newSuggestions.results? then newSuggestions.results else newSuggestions)
+          callback()
+    jobRunner.onReady => onComplete results: deepFlatten completionsByCompleter
 
 # Utilities which help us compute a relevancy score for a given item.
 RankingUtils =
