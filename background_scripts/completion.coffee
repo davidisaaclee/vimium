@@ -524,6 +524,16 @@ class SearchEngineCompleter
             suggestion.title ||= suggestion.insertText
             break
 
+# Recursive flattens array until all elements do not pass `Array.isArray`.
+deepFlatten = (array) ->
+  result = []
+  for element in array
+    if Array.isArray element
+      result.push (deepFlatten element)...
+    else
+      result.push element
+  result
+
 class SegmentedMultiCompleter
   constructor: (@completers) ->
 
@@ -532,17 +542,13 @@ class SegmentedMultiCompleter
   cancel: (port) -> completer.cancel? port for completer in @completers
 
   filter: (request, onComplete) ->
-    runChildCompletions =
-      @completers.map (completer) -> new Promise (resolve) -> completer.filter request, resolve
-
-    Promise.all runChildCompletions
-      .then (completionsByCompleter) ->
-        flattenedCompletions = [].concat.apply [],
-          completionsByCompleter.map (completions) ->
-            # TODO: I'm not certain why some completions have a `results` field
-            # and others are the literal results.
-            if completions.results? then completions.results else completions
-        onComplete results: flattenedCompletions
+    completionsByCompleter = @completers.map -> []
+    jobRunner = new JobRunner @completers.map (completer, completerIndex) ->
+      (callback) ->
+        completer.filter request, (newSuggestions = [], { continuation, filter } = {}) ->
+          completionsByCompleter[completerIndex].push (if newSuggestions.results? then newSuggestions.results else newSuggestions)
+          callback()
+    jobRunner.onReady => onComplete results: deepFlatten completionsByCompleter
 
 # A completer which calls filter() on many completers, aggregates the results, ranks them, and returns the top
 # 10. All queries from the vomnibar come through a multi completer.
