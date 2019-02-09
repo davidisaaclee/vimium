@@ -622,6 +622,8 @@ class MultiCompleter
     suggestion.generateHtml request for suggestion in suggestions
     suggestions
 
+# Performs a completion in parallel on mutiple completers, and returns the
+# aggregate results grouped and ordered by completer.
 class SegmentedMultiCompleter
   constructor: (@completers) ->
 
