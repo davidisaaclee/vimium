@@ -177,6 +177,7 @@ Commands =
       ["Vomnibar.activate",
       "Vomnibar.activateInNewTab",
       "Vomnibar.activateOmniPlusTabs",
+      "Vomnibar.activateOmniPlusTabsInNewTab",
       "Vomnibar.activateBookmarks",
       "Vomnibar.activateBookmarksInNewTab",
       "Vomnibar.activateTabSelection",
@@ -400,6 +401,7 @@ commandDescriptions =
   "Vomnibar.activate": ["Open URL, bookmark or history entry", { topFrame: true }]
   "Vomnibar.activateInNewTab": ["Open URL, bookmark or history entry in a new tab", { topFrame: true }]
   "Vomnibar.activateOmniPlusTabs": ["Navigate to an open tab, URL, bookmark or history entry", { topFrame: true }]
+  "Vomnibar.activateOmniPlusTabsInNewTab": ["Navigate to an open tab, URL, bookmark or history entry in new tab", { topFrame: true }]
   "Vomnibar.activateTabSelection": ["Search through your open tabs", { topFrame: true }]
   "Vomnibar.activateBookmarks": ["Open a bookmark", { topFrame: true }]
   "Vomnibar.activateBookmarksInNewTab": ["Open a bookmark in a new tab", { topFrame: true }]

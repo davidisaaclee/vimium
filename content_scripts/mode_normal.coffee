@@ -212,6 +212,7 @@ if Vomnibar?
     "Vomnibar.activate": Vomnibar.activate.bind Vomnibar
     "Vomnibar.activateInNewTab": Vomnibar.activateInNewTab.bind Vomnibar
     "Vomnibar.activateOmniPlusTabs": Vomnibar.activateOmniPlusTabs.bind Vomnibar
+    "Vomnibar.activateOmniPlusTabsInNewTab": Vomnibar.activateOmniPlusTabsInNewTab.bind Vomnibar
     "Vomnibar.activateTabSelection": Vomnibar.activateTabSelection.bind Vomnibar
     "Vomnibar.activateBookmarks": Vomnibar.activateBookmarks.bind Vomnibar
     "Vomnibar.activateBookmarksInNewTab": Vomnibar.activateBookmarksInNewTab.bind Vomnibar

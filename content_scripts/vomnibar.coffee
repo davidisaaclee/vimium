@@ -23,6 +23,10 @@ Vomnibar =
     @extractOptionsFromRegistryEntry registryEntry, (options) =>
       @open sourceFrameId, extend options, completer:"omniPlusTabs"
 
+  activateOmniPlusTabsInNewTab: (sourceFrameId, registryEntry) ->
+    @extractOptionsFromRegistryEntry registryEntry, (options) =>
+      @open sourceFrameId, extend options, completer:"omniPlusTabs", newTab: true
+
   activateTabSelection: (sourceFrameId) -> @open sourceFrameId, {
     completer: "tabs"
     selectFirst: true
