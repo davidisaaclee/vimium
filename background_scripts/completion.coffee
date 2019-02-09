@@ -499,7 +499,6 @@ class SearchEngineCompleter
         filter: filter
         continuation: (onComplete) =>
           CompletionSearch.complete searchUrl, queryTerms, (suggestions = []) =>
-            console.log "fetched suggestions:", suggestions.length, query if SearchEngineCompleter.debug
             onComplete suggestions.map mkSuggestion
 
   computeRelevancy: ({ relevancyData, queryTerms, title }) ->
@@ -533,18 +532,17 @@ class SegmentedMultiCompleter
   cancel: (port) -> completer.cancel? port for completer in @completers
 
   filter: (request, onComplete) ->
-    console.log "in filter"
-    # TODO: Check if `onComplete` should be called multiple times
-    # I think it can be
-    Promise.all (@completers
-      .map (completer) ->
-        new Promise((resolve) ->
-          (completer.filter request, resolve)))
+    runChildCompletions =
+      @completers.map (completer) -> new Promise (resolve) -> completer.filter request, resolve
+
+    Promise.all runChildCompletions
       .then (completionsByCompleter) ->
-        results = [].concat.apply [],
+        flattenedCompletions = [].concat.apply [],
           completionsByCompleter.map (completions) ->
+            # TODO: I'm not certain why some completions have a `results` field
+            # and others are the literal results.
             if completions.results? then completions.results else completions
-        onComplete results: results
+        onComplete results: flattenedCompletions
 
 # A completer which calls filter() on many completers, aggregates the results, ranks them, and returns the top
 # 10. All queries from the vomnibar come through a multi completer.
